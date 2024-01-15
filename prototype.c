@@ -116,10 +116,12 @@ keyInput:
     }
     printf("\n----------------\n");
     
-    const char *filePath = "nuclear missile codes.txt";
+    char filepath[100];
+    printf("\nEnter the filename/filepath of the file to be encrypted:   ");
+    scanf("%s", &filepath);    
 
     // Open the file
-    FILE *read = fopen(filePath, "r");
+    FILE *read = fopen(filepath, "r");
     FILE *write = fopen("output.txt", "w");
 
     // Check if the file was opened successfully
