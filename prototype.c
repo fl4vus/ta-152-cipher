@@ -87,25 +87,22 @@ int main()
         num_array[i] = i;
         new_map[i] = i;
     }
+
+keyInput:
+    int key;
+    printf("\nMake Encryption PIN (4 Digits):    ");
+    scanf("%d", &key);
     
-    /*
-    reverseArray(new_map, 0, siz);
-    printf("\n----------------\n");
-    for(int j = 0; j < siz; j++)
+    if ((key < 1000)||(key > 9999))
     {
-        printf("%d ", new_map[j]);
+        printf("\nINVALID PIN. RE-ENTER");
+        goto keyInput;
     }
-    printf("\n----------------\n");
-    reverseArray(new_map, 0, siz);
-    for(int j = 0; j < siz; j++)
-    {
-        printf("%d ", new_map[j]);
-    }
-    printf("\n----------------\n");
-    */
-    superShuffle(new_map, 1, siz);
-    superShuffle(new_map, 2, siz);
-    superShuffle(new_map, 4, siz);
+
+    int trueKey = key % 10;
+
+    superShuffle(new_map, trueKey, siz);
+
     
     printf("----------------\n");
     for(int j = 0; j < siz; j++)
@@ -161,25 +158,10 @@ int main()
     fclose(write);
 
     // Decrypter
-
-    char newChararr[siz];
-    printf("\n");
-    for (int i = 0; i < siz; i++)
-    {
-        int charPos = findMapPosition(new_map, siz, i);
-        //printf("%d ", charPos);
-        newChararr[charPos] = allCharacters[i];
-    }
-    /*
-    printf("\n");
-    for (int i = 0; i < siz; i++)
-    {
-        printf("%c ", newChararr[i]);
-    }
-    */
-    superShuffle(new_map, 4, siz);
-    superShuffle(new_map, 2, siz);
-    superShuffle(new_map, 1, siz);
+enterPass:   
+    int passw;
+    printf("\nEnter PIN:     ");
+    scanf("%d", &passw);
 
     const char *filePath2 = "output.txt";
 
@@ -187,40 +169,74 @@ int main()
     FILE *read2 = fopen(filePath2, "r");
     FILE *write2 = fopen("decrypt.txt", "w");
 
-    // Check if the file was opened successfully
-    if (read2 == NULL) {
-        perror("Error opening file");
-        return 1;
-    }
-
-    // Read and print characters from the file
-    int character2;
-    while ((character2 = fgetc(read2)) != EOF) 
+    if (passw == key)
     {
-        char char_ch;
-        char_ch = character2;
-        int pos = findCharPosition(newChararr, siz, char_ch);
-        int map_pos = findMapPosition(new_map, siz, pos);
-
-        printf("\n %c", char_ch);
-        printf("--> %d", pos);
-        
-        printf("--> %d", map_pos);
-        char writer = newChararr[map_pos];
-        printf("--> %c", writer);
-        if ((pos == -1) || (map_pos == -1))
+        char newChararr[siz];
+        printf("\n");
+        for (int i = 0; i < siz; i++)
         {
-            fputc(char_ch, write2);
+            int charPos = findMapPosition(new_map, siz, i);
+            //printf("%d ", charPos);
+            newChararr[charPos] = allCharacters[i];
         }
-        else
+        
+        for (int i = 0; i < siz; i++)
         {
-            fputc(writer, write2);
+            printf("%c ", newChararr[i]);
+        }
+        
+        superShuffle(new_map, trueKey, siz);
+        //superShuffle(new_map, 1, siz);
+        //superShuffle(new_map, 2, siz);
+
+        
+
+        // Check if the file was opened successfully
+        if (read2 == NULL) {
+            perror("Error opening file");
+            return 1;
+        }
+
+        // Read and print characters from the file
+        int character2;
+        while ((character2 = fgetc(read2)) != EOF) 
+        {
+            char char_ch;
+            char_ch = character2;
+            int pos = findCharPosition(newChararr, siz, char_ch);
+            int map_pos = findMapPosition(new_map, siz, pos);
+
+            printf("\n %c", char_ch);
+            printf("--> %d", pos);
+            
+            printf("--> %d", map_pos);
+            char writer = allCharacters[map_pos];
+            printf("--> %c", writer);
+            if ((pos == -1) || (map_pos == -1))
+            {
+                fputc(char_ch, write2);
+            }
+            else
+            {
+                fputc(writer, write2);
+            }
         }
     }
+    else
+    {
+        char message[16] = "INVALID PASSWORD";
+        for (int i = 0; i < 16; i++)
+        {
+            fputc(message[i], write2);
+        }
+        printf("%s", message);
+    }
+
+    
 
     // Close the file
     fclose(read);
     fclose(write);
-
+    printf("\n");
     return 0;
 }
